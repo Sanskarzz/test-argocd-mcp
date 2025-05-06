@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: my-canary-app
+  namespace: my-apps
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-canary-app
+      env: production
+  template:
+    metadata:
+      labels:
+        env: production
+        app: my-canary-app
+    spec:
+      containers:
+      - name: my-canary-app
+        image: sanskardevops/test-application-1:0.0.3
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+  strategy:
+    canary:
+      maxSurge: 1
+      maxUnavailable: 0
+      canaryService: my-canary-service
+      stableService: my-stable-service
+      trafficRouting:
+        nginx:
+          stableIngress: my-canary-app-ingress
+      steps:
+      - setWeight: 10
+      - pause:
+          duration: 60s
+      - setWeight: 50
+      - pause:
+          duration: 60s
+      - setWeight: 100
