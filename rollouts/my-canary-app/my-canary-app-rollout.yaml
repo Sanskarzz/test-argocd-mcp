@@ -12,8 +12,8 @@ spec:
   template:
     metadata:
       labels:
-        env: production
         app: my-canary-app
+        env: production
     spec:
       containers:
       - name: my-canary-app
@@ -33,6 +33,12 @@ spec:
           stableIngress: my-canary-app-ingress
       steps:
       - setWeight: 10
+      - pause:
+          duration: 60s
+      - setWeight: 50
+      - pause:
+          duration: 60s
+      - setWeight: 100
       - pause:
           duration: 60s
       - setWeight: 50
