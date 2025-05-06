@@ -46,24 +46,14 @@ metadata:
   name: my-stable-service
   namespace: my-apps
 spec:
-  clusterIP: 10.96.11.162
-  clusterIPs:
-  - 10.96.11.162
-  internalTrafficPolicy: Cluster
-  ipFamilies:
-  - IPv4
-  ipFamilyPolicy: SingleStack
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 8080
   selector:
     app: my-canary-app
     env: production
-  sessionAffinity: None
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
   type: ClusterIP
-status:
-  loadBalancer: {}
 ---
 apiVersion: v1
 kind: Service
@@ -71,35 +61,30 @@ metadata:
   name: my-canary-service
   namespace: my-apps
 spec:
-  clusterIP: 10.96.218.204
-  clusterIPs:
-  - 10.96.218.204
-  internalTrafficPolicy: Cluster
-  ipFamilies:
-  - IPv4
-  ipFamilyPolicy: SingleStack
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 8080
   selector:
     app: my-canary-app
     env: production
-  sessionAffinity: None
-  type: ClusterIP
-status:
-  loadBalancer: {}
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  type: ClusterIP 
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/canary-by-header: X-Canary
+    nginx.ingress.kubernetes.io/canary-by-header-value: "true"
+  labels:
+    argocd.argoproj.io/instance: my-canary-argo-app
   name: my-canary-app-ingress
   namespace: my-apps
 spec:
   rules:
-  - http:
+  - host: my-app.example.com
+    http:
       paths:
       - backend:
           service:
@@ -108,5 +93,3 @@ spec:
               number: 80
         path: /
         pathType: Prefix
-status:
-  loadBalancer: {}
