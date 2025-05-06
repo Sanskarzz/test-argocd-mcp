@@ -7,8 +7,8 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app: my-canary-app
       env: production
+      app: my-canary-app
   template:
     metadata:
       labels:
@@ -33,12 +33,6 @@ spec:
           stableIngress: my-canary-app-ingress
       steps:
       - setWeight: 10
-      - pause:
-          duration: 60s
-      - setWeight: 50
-      - pause:
-          duration: 60s
-      - setWeight: 100
       - pause:
           duration: 60s
       - setWeight: 50
