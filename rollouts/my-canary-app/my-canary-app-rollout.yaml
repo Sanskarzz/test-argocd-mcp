@@ -7,8 +7,8 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      env: production
       app: my-canary-app
+      env: production
   template:
     metadata:
       labels:
